@@ -112,8 +112,16 @@ def open_file():
                                    faceSpot=[0, 0],
                                    stickerSpot=[0, 0])
     selfcustomizeSticker.createButton(1, 10)
+    label = tk.Label(root, text="从此处按住开始拖动自定义贴纸")
+    label.grid()
+    label.bind("<B1-Motion>", moveimg)
 
 
+def moveimg(event):
+    selfcustomizeSticker.stickerSpot[0] = - event.x
+    selfcustomizeSticker.stickerSpot[1] = - event.y
+
+    
 class Sticker:
     def __init__(self, name, path, faceSpot, stickerSpot):
         self.name = name
