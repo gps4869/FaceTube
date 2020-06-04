@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import dialog, filedialog
+from tkinter import dialog, filedialog, ttk
 from cv2 import cv2
 from PIL import Image, ImageTk
 import numpy as np
@@ -8,9 +8,10 @@ import os
 
 def videoCapture():
     #读取摄像头捕捉到的图片
-    flag, img1_BGR = camera.read()
+    flag, img1_BGR = camera.read()  #第二个参数是一帧一帧读取的图片
     if flag:
-        img1_RGBA = cv2.cvtColor(img1_BGR, cv2.COLOR_BGR2RGBA)
+        img1_RGBA = cv2.cvtColor(img1_BGR,
+                                 cv2.COLOR_BGR2RGBA)  #把读入的BGR格式转换成RGB格式
         return flag, img1_RGBA
     else:
         print('Please check your camera!')
@@ -24,6 +25,7 @@ def faceRecognition(img1_RGBA, path_of_facerecognition_package, face_param):
                                          scaleFactor=1.2,
                                          minNeighbors=5,
                                          minSize=(32, 32))
+    #scaleFactor表示每次图像尺寸减小的比例minNeighbors表示每一个目标至少要被检测到3次才算是真的目标(因为周围的像素和不同的窗口大小都可以检测到人脸)minSize为目标的最小尺寸
     if isinstance(faces, np.ndarray):
         if isinstance(face_param, bool):
             face_param = list(faces[0][:3])
@@ -36,12 +38,12 @@ def faceRecognition(img1_RGBA, path_of_facerecognition_package, face_param):
         return False
 
 
-def outputAddedImg(img1_RGBA):
+def outputAddedImg(img1_RGBA, label):
     #把图片转化成tkinter能输出的格式
-    current_image = Image.fromarray(img1_RGBA)
-    imgtk = ImageTk.PhotoImage(image=current_image)
-    ImgOutput.imgtk = imgtk
-    ImgOutput.config(image=imgtk)
+    current_image = Image.fromarray(img1_RGBA)  #转换为pillow图像
+    imgtk = ImageTk.PhotoImage(image=current_image)  #转换为与tkinter兼容的照片图像
+    label.imgtk = imgtk
+    label.config(image=imgtk)
 
 
 def videoLoop():
@@ -57,48 +59,14 @@ def videoLoop():
                     img1_RGBA, face_param)
                 spaceFlags.append(spaceFlag)
             if not False in spaceFlags:
-                outputAddedImg(img1_RGBA)
+                outputAddedImg(img1_RGBA, ImgOutput)
     root.after(40, videoLoop)  #每40秒循环一次这个主程序
 
 
 def save_file():
     #保存图片
     img1_BGR = cv2.cvtColor(img1_RGBA, cv2.COLOR_RGBA2BGR)
-    dialog.Dialog(
-        None, {
-            'title': 'File Modified',
-            'text': '注意路径中不能含有中文字符！请务必添加后缀名！',
-            'bitmap': 'warning',
-            'default': 0,
-            'strings': ('OK', 'Cancel')
-        })
-    file_path = filedialog.asksaveasfilename(title=u'保存文件')
-    try:
-        print('保存文件：', file_path)
-        cv2.imwrite(filename=file_path, img=img1_BGR)
-        dialog.Dialog(
-            None, {
-                'title': 'File Modified',
-                'text': '保存完成',
-                'bitmap': 'warning',
-                'default': 0,
-                'strings': ('OK', 'Cancle')
-            })
-        print('保存完成')
-    except:
-        dialog.Dialog(
-            None, {
-                'title': 'File Modified',
-                'text': '请输入可用路径',
-                'bitmap': 'warning',
-                'default': 0,
-                'strings': ('OK', 'Cancle')
-            })
-
-
-def open_file():
-    #读取读者自定义的贴纸
-    dialog.Dialog(
+    choice = dialog.Dialog(
         None, {
             'title': 'File Modified',
             'text': '注意路径中不能含有中文字符！',
@@ -106,23 +74,85 @@ def open_file():
             'default': 0,
             'strings': ('OK', 'Cancel')
         })
-    global selfcustomizeSticker
-    selfcustomizesticker_path = tk.filedialog.askopenfilename(title=u'打开贴图')
-    selfcustomizeSticker = Sticker(name='selfcustomizeSticker',
-                                   path=selfcustomizesticker_path,
-                                   faceSpot=[0, 0],
-                                   stickerSpot=[0, 0])
-    selfcustomizeSticker.createButton(1, 10)
-    label = tk.Label(root, text="从此处按住开始拖动自定义贴纸")
-    label.grid()
-    label.bind("<B1-Motion>", moveimg)
+    if choice.num == 0:
+        file_path = filedialog.asksaveasfilename(title=u'保存文件')
+        try:
+            print('保存文件：', file_path)
+            cv2.imwrite(filename=file_path, img=img1_BGR)
+            dialog.Dialog(
+                None, {
+                    'title': 'File Modified',
+                    'text': '保存完成',
+                    'bitmap': 'warning',
+                    'default': 0,
+                    'strings': ('OK', 'Cancle')
+                })
+            print('保存完成')
+        except:
+            print('Close by user.')
+
+
+def open_file():
+    #读取读者自定义的贴纸
+    choice = dialog.Dialog(
+        None, {
+            'title': 'File Modified',
+            'text': '图片路径中不能含有中文字符！',
+            'bitmap': 'warning',
+            'default': 0,
+            'strings': ('OK', 'Cancle')
+        })
+    if choice == 0:
+        global selfcustomizeSticker
+        selfcustomizesticker_path = tk.filedialog.askopenfilename(
+            title=u'打开贴图')
+        selfcustomizeSticker = Sticker(name='selfcustomizeSticker',
+                                       path=selfcustomizesticker_path,
+                                       faceSpot=[0, 0],
+                                       stickerSpot=[0, 0])
+        selfcustomizeSticker.createButton()
+        label = tk.Label(root, text="从此处按住开始拖动自定义贴纸")
+        label.grid()
+        label.bind("<B1-Motion>", moveimg)
 
 
 def moveimg(event):
-    selfcustomizeSticker.stickerSpot[0] = - event.x
-    selfcustomizeSticker.stickerSpot[1] = - event.y
+    selfcustomizeSticker.stickerSpot[0] = -event.x
+    selfcustomizeSticker.stickerSpot[1] = -event.y
 
-    
+
+class StickerFamily:
+    def __init__(self, familyname, contents):
+        self.familyname = familyname
+        self.contents = contents
+
+    def createfamilyButton(self, row, column):
+        self.v = tk.IntVar()
+        self.button = tk.Checkbutton(root,
+                                     text=self.familyname,
+                                     variable=self.v,
+                                     command=self.openToplevel)  #多选框
+        self.button.grid(row=row, column=column, sticky='W' + 'E' + 'N' + 'S')
+
+    def openToplevel(self):
+        if self.v.get() == 1:  #如果相应的多选框被选中
+            self.toplevel = tk.Toplevel()
+            self.toplevel.title = self.familyname
+            for content in self.contents:
+                im = Image.open(content.path)
+                content.img1 = ImageTk.PhotoImage(im)
+                content.label = tk.Label(self.toplevel)
+                content.label.grid()
+                content.label.config(image=content.img1)
+                content.v = tk.IntVar()
+                content.button = tk.Checkbutton(self.toplevel,
+                                                text=content.name,
+                                                variable=content.v,
+                                                command=content.addToImg)  #单选框
+                content.button.grid(sticky='W' + 'E' + 'N' + 'S')
+            self.toplevel.mainloop()
+
+
 class Sticker:
     def __init__(self, name, path, faceSpot, stickerSpot):
         self.name = name
@@ -136,13 +166,13 @@ class Sticker:
         #stickerSpot是贴图用于定位的点，是预置好的数值
         #自定义贴图无预置数值，可以由使用者手动操作
 
-    def createButton(self, row, column):
+    def createButton(self):
         self.v = tk.IntVar()
         self.button = tk.Checkbutton(root,
                                      text=self.name,
                                      variable=self.v,
-                                     command=self.addToImg)  #多选框
-        self.button.grid(row=row, column=column, sticky='W' + 'E' + 'N' + 'S')
+                                     command=self.addToImg)
+        self.button.grid(sticky='W' + 'E' + 'N' + 'S')
 
     def addToImg(self):
         if self.v.get() == 1:  #如果相应的多选框被选中
@@ -153,9 +183,13 @@ class Sticker:
     def addTwoImgs(self, img1_RGBA, face_param):
         #将贴纸贴到图片上
         self.img = cv2.imread(self.path)
-        self.rows, self.cols = self.img.shape[:2]
+        try:
+            self.rows, self.cols = self.img.shape[:2]
+        except:
+            print('Fail in loading sticker!')
         self.getStickerPosition(face_param)
-        if self.x1 >= 0 and self.x2 >= 0 and self.y1 >= 0 and self.y2 >= 0:
+        if self.x1 >= 0 and self.x2 <= img1_RGBA.shape[
+                1] and self.y1 >= 0 and self.y2 <= img1_RGBA.shape[0]:
             #制作掩膜
             roi = img1_RGBA[self.y1:self.y2, self.x1:self.x2]
             sticker_gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -186,6 +220,7 @@ class Sticker:
 if __name__ == '__main__':
     camera = cv2.VideoCapture(0)  #打开摄像头
     root = tk.Tk()
+    root.title('FaceTube')
     ImgOutput = tk.Label(root)  #创建图形输出标签
     ImgOutput.grid(row=0, column=0, rowspan=10, columnspan=10)
     root.config(cursor="arrow")
@@ -194,11 +229,16 @@ if __name__ == '__main__':
     loadButton = tk.Button(root, text='自定义贴图', command=open_file)
     loadButton.grid(row=11, column=1)
     stickers = []  #记载需要放入图中的贴纸有哪几项
+    Hat = Sticker(name='Hat',
+                  path='Hat.png',
+                  faceSpot=[0.5, 0],
+                  stickerSpot=[169, 200])
     ChristmasHat = Sticker(name='ChristmasHat',
-                           path='ChristmasHat.jpg',
+                           path='ChristmasHat.png',
                            faceSpot=[0.5, 0],
                            stickerSpot=[77, 154])
-    ChristmasHat.createButton(0, 10)
+    HatFamily = StickerFamily('Hat', [ChristmasHat, Hat])
+    HatFamily.createfamilyButton(0, 10)
     face_param = [0, 0, 0]
     videoLoop()
     root.mainloop()
