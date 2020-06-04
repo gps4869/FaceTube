@@ -60,7 +60,8 @@ def videoLoop():
                 spaceFlags.append(spaceFlag)
             if not False in spaceFlags:
                 outputAddedImg(img1_RGBA, ImgOutput)
-    root.after(40, videoLoop)  #每40秒循环一次这个主程序
+    HatFamily.check()
+    root.after(40, videoLoop)  #每40毫秒循环一次这个主程序
 
 
 def save_file():
@@ -151,6 +152,16 @@ class StickerFamily:
                                                 command=content.addToImg)  #单选框
                 content.button.grid(sticky='W' + 'E' + 'N' + 'S')
             self.toplevel.mainloop()
+
+    def check(self):
+        flag = False
+        for Sticker in stickers:
+            if Sticker in self.contents:
+                flag = True
+        if flag == False:
+            self.v.set(0)
+        else:
+            self.v.set(1)
 
 
 class Sticker:
