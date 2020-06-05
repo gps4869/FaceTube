@@ -103,7 +103,7 @@ def open_file():
             'default': 0,
             'strings': ('OK', 'Cancle')
         })
-    if choice == 0:
+    if choice.num == 0:
         global selfcustomizeSticker
         selfcustomizesticker_path = tk.filedialog.askopenfilename(
             title=u'打开贴图')
