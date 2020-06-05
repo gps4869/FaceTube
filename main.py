@@ -25,7 +25,7 @@ def faceRecognition(img1_RGBA, path_of_facerecognition_package, face_param):
                                          scaleFactor=1.2,
                                          minNeighbors=5,
                                          minSize=(32, 32))
-    #scaleFactor表示每次图像尺寸减小的比例minNeighbors表示每一个目标至少要被检测到3次才算是真的目标(因为周围的像素和不同的窗口大小都可以检测到人脸)minSize为目标的最小尺寸
+    #scaleFactor表示每次图像尺寸减小的比例minNeighbors表示每一个目标至少要被检测到5次才算是真的目标(因为周围的像素和不同的窗口大小都可以检测到人脸)minSize为目标的最小尺寸
     if isinstance(faces, np.ndarray):
         if isinstance(face_param, bool):
             face_param = list(faces[0][:3])
@@ -49,7 +49,7 @@ def outputAddedImg(img1_RGBA, label):
 def videoLoop():
     global img1_RGBA, face_param
     flag, img1_RGBA = videoCapture()
-    path = r'D:\Anaconda\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
+    path = r'D:\Python\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
     if flag:
         face_param = faceRecognition(img1_RGBA, path, face_param)
         if face_param:
@@ -61,6 +61,8 @@ def videoLoop():
             if not False in spaceFlags:
                 outputAddedImg(img1_RGBA, ImgOutput)
     HatFamily.check()
+    BeardFamily.check()
+    GlassesFamily.check()
     root.after(40, videoLoop)  #每40毫秒循环一次这个主程序
 
 
@@ -138,7 +140,6 @@ class StickerFamily:
     def openToplevel(self):
         if self.v.get() == 1:  #如果相应的多选框被选中
             self.toplevel = tk.Toplevel()
-            self.toplevel.title = self.familyname
             for content in self.contents:
                 im = Image.open(content.path)
                 content.img1 = ImageTk.PhotoImage(im)
@@ -248,8 +249,40 @@ if __name__ == '__main__':
                            path='ChristmasHat.png',
                            faceSpot=[0.5, 0],
                            stickerSpot=[77, 154])
-    HatFamily = StickerFamily('Hat', [ChristmasHat, Hat])
+    BearHat=Sticker(name='BearHat',
+                    path='BearHat.png',
+                    faceSpot=[0.5, 0],
+                    stickerSpot=[100, 200])
+    HatFamily = StickerFamily('Hat', [ChristmasHat, Hat, BearHat])
     HatFamily.createfamilyButton(0, 10)
+    BrownBeard=Sticker(name='BrownBeard',
+                       path='BrownBeard.png',
+                       faceSpot=[0.5, 0.8],
+                       stickerSpot=[100, 100])
+    Beard=Sticker(name='Beard',
+                  path='Beard.png',
+                  faceSpot=[0.5, 0.8],
+                  stickerSpot=[100, 100])
+    GreyBeard=Sticker(name='GreyBeard',
+                      path='GreyBeard.png',
+                      faceSpot=[0.5, 0.8],
+                      stickerSpot=[100, 100])
+    BeardFamily = StickerFamily('Beard', [Beard, BrownBeard, GreyBeard])
+    BeardFamily.createfamilyButton(1,10)
+    Glasses=Sticker(name='Glasses',
+                    path='Glasses.png',
+                    faceSpot=[0.5, 0.4],
+                    stickerSpot=[100, 100])
+    SunGlasses=Sticker(name='SunGlasses',
+                       path='SunGlasses.png',
+                       faceSpot=[0.5, 0.4],
+                       stickerSpot=[100, 100])
+    CoolGlasses=Sticker(name='CoolGlasses',
+                        path='CoolGlasses.png',
+                        faceSpot=[0.5, 0.4],
+                        stickerSpot=[100, 100])
+    GlassesFamily = StickerFamily('Glasses', [Glasses, SunGlasses, CoolGlasses])
+    GlassesFamily.createfamilyButton(2,10)
     face_param = [0, 0, 0]
     videoLoop()
     root.mainloop()
