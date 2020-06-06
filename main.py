@@ -195,6 +195,7 @@ class Sticker:
     def addTwoImgs(self, img1_RGBA, face_param):
         #将贴纸贴到图片上
         self.img = cv2.imread(self.path)
+        self.img = cv2.resize(self.img,(int(face_param[2]/1),int(face_param[2]/1)),interpolation=cv2.INTER_CUBIC)
         try:
             self.rows, self.cols = self.img.shape[:2]
         except:
@@ -221,8 +222,8 @@ class Sticker:
         #将贴图与图片定位：在贴图和照片上各选取一个点，使得这两个点重合
         self.img_x = self.faceSpot[0] * face_param[2] + face_param[0]
         self.img_y = self.faceSpot[1] * face_param[2] + face_param[1]
-        self.stickerSpot_x = self.stickerSpot[0]
-        self.stickerSpot_y = self.stickerSpot[1]
+        self.stickerSpot_x = self.stickerSpot[0]*face_param[2]
+        self.stickerSpot_y = self.stickerSpot[1]*face_param[2]
         self.x1 = int(self.img_x - self.stickerSpot_x)
         self.y1 = int(self.img_y - self.stickerSpot_y)
         self.x2 = int(self.x1 + self.cols)
@@ -244,43 +245,43 @@ if __name__ == '__main__':
     Hat = Sticker(name='Hat',
                   path='Hat.png',
                   faceSpot=[0.5, 0],
-                  stickerSpot=[169, 200])
+                  stickerSpot=[0.5,1])
     ChristmasHat = Sticker(name='ChristmasHat',
                            path='ChristmasHat.png',
                            faceSpot=[0.5, 0],
-                           stickerSpot=[77, 154])
+                           stickerSpot=[0.5,1])
     BearHat=Sticker(name='BearHat',
                     path='BearHat.png',
                     faceSpot=[0.5, 0],
-                    stickerSpot=[100, 200])
+                    stickerSpot=[0.5,1])
     HatFamily = StickerFamily('Hat', [ChristmasHat, Hat, BearHat])
     HatFamily.createfamilyButton(0, 10)
     BrownBeard=Sticker(name='BrownBeard',
                        path='BrownBeard.png',
                        faceSpot=[0.5, 0.8],
-                       stickerSpot=[100, 100])
+                       stickerSpot=[0.5,0.5])
     Beard=Sticker(name='Beard',
                   path='Beard.png',
                   faceSpot=[0.5, 0.8],
-                  stickerSpot=[100, 100])
+                  stickerSpot=[0.5,0.5])
     GreyBeard=Sticker(name='GreyBeard',
                       path='GreyBeard.png',
                       faceSpot=[0.5, 0.8],
-                      stickerSpot=[100, 100])
+                      stickerSpot=[0.5,0.5])
     BeardFamily = StickerFamily('Beard', [Beard, BrownBeard, GreyBeard])
     BeardFamily.createfamilyButton(1,10)
     Glasses=Sticker(name='Glasses',
                     path='Glasses.png',
                     faceSpot=[0.5, 0.4],
-                    stickerSpot=[100, 100])
+                    stickerSpot=[0.5,0.5])
     SunGlasses=Sticker(name='SunGlasses',
                        path='SunGlasses.png',
                        faceSpot=[0.5, 0.4],
-                       stickerSpot=[100, 100])
+                       stickerSpot=[0.5,0.5])
     CoolGlasses=Sticker(name='CoolGlasses',
                         path='CoolGlasses.png',
                         faceSpot=[0.5, 0.4],
-                        stickerSpot=[100, 100])
+                        stickerSpot=[0.5,0.5])
     GlassesFamily = StickerFamily('Glasses', [Glasses, SunGlasses, CoolGlasses])
     GlassesFamily.createfamilyButton(2,10)
     face_param = [0, 0, 0]
