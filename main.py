@@ -124,8 +124,9 @@ def open_file():
 
 
 def moveimg(event):
-    selfcustomizeSticker.stickerSpot[0] = -event.x
-    selfcustomizeSticker.stickerSpot[1] = -event.y
+    height, width = selfcustomizeSticker.img.shape[:2]
+    selfcustomizeSticker.stickerSpot[0] = -event.x / width
+    selfcustomizeSticker.stickerSpot[1] = -event.y / height
 
 
 class StickerFamily:
@@ -241,7 +242,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('FaceTube')
     NoteLabel = tk.Label(root)
-    NoteLabel.grid(row=0, column=0)
+    NoteLabel.grid(row=0, column=0, columnspan=10)
     ImgOutput = tk.Label(root)  #创建图形输出标签
     ImgOutput.grid(row=1, column=0, rowspan=10, columnspan=10)
     root.config(cursor="arrow")
