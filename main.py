@@ -96,7 +96,7 @@ def save_file():
                 })
             print('保存完成')
         except:
-            print('Close by user.')
+            print('Close by user or use the wrong path.')
 
 
 def open_file():
@@ -179,8 +179,8 @@ class Sticker:
         #定义脸部的左上角为脸部原点
         #第一个值是脸部原点到该点横向距离占脸部总宽度的比例
         #第二个值是脸部原点到该点纵向距离占脸部总高度的比例
-        #stickerSpot是贴图用于定位的点，是预置好的数值
-        #自定义贴图无预置数值，可以由使用者手动操作
+        #同理，stickerSpot是用于在贴图上定位的列表。
+        #两个点重合即可将贴图定位到图片上。
 
     def createButton(self):
         self.v = tk.IntVar()
