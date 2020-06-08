@@ -14,7 +14,7 @@ def videoCapture():
                                  cv2.COLOR_BGR2RGBA)  #把读入的BGR格式转换成RGB格式
         return flag, img1_RGBA
     else:
-        print('Please check your camera!')
+        NoteLabel.config(text='Please check your camera!')
         return False, None
 
 
@@ -34,7 +34,10 @@ def faceRecognition(img1_RGBA, path_of_facerecognition_package, face_param):
             face_param = list(faces[0][:3])
         return face_param
     else:
-        print("Unable to recognize face!")
+        NoteLabel.config(
+            text=
+            "Unable to recognize face! Please adjust camera angle or face to camera!"
+        )
         return False
 
 
@@ -44,12 +47,13 @@ def outputAddedImg(img1_RGBA, label):
     imgtk = ImageTk.PhotoImage(image=current_image)  #转换为与tkinter兼容的照片图像
     label.imgtk = imgtk
     label.config(image=imgtk)
+    NoteLabel.config(text='The program runs correctly…')
 
 
 def videoLoop():
     global img1_RGBA, face_param
     flag, img1_RGBA = videoCapture()
-    path = r'D:\Python\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
+    path = r'D:\Anaconda\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml'
     if flag:
         face_param = faceRecognition(img1_RGBA, path, face_param)
         if face_param:
@@ -195,11 +199,13 @@ class Sticker:
     def addTwoImgs(self, img1_RGBA, face_param):
         #将贴纸贴到图片上
         self.img = cv2.imread(self.path)
-        self.img = cv2.resize(self.img,(int(face_param[2]/1),int(face_param[2]/1)),interpolation=cv2.INTER_CUBIC)
+        self.img = cv2.resize(self.img,
+                              (int(face_param[2] / 1), int(face_param[2] / 1)),
+                              interpolation=cv2.INTER_CUBIC)
         try:
             self.rows, self.cols = self.img.shape[:2]
         except:
-            print('Fail in loading sticker!')
+            NoteLabel.config(text='Fail in loading sticker!')
         self.getStickerPosition(face_param)
         if self.x1 >= 0 and self.x2 <= img1_RGBA.shape[
                 1] and self.y1 >= 0 and self.y2 <= img1_RGBA.shape[0]:
@@ -215,15 +221,15 @@ class Sticker:
             img1_RGBA[self.y1:self.y2, self.x1:self.x2] = dst
             return True, img1_RGBA
         else:
-            print("No enough space for stickers!")
+            NoteLabel.config(text="No enough space for stickers!")
             return False, None
 
     def getStickerPosition(self, face_param):
         #将贴图与图片定位：在贴图和照片上各选取一个点，使得这两个点重合
         self.img_x = self.faceSpot[0] * face_param[2] + face_param[0]
         self.img_y = self.faceSpot[1] * face_param[2] + face_param[1]
-        self.stickerSpot_x = self.stickerSpot[0]*face_param[2]
-        self.stickerSpot_y = self.stickerSpot[1]*face_param[2]
+        self.stickerSpot_x = self.stickerSpot[0] * face_param[2]
+        self.stickerSpot_y = self.stickerSpot[1] * face_param[2]
         self.x1 = int(self.img_x - self.stickerSpot_x)
         self.y1 = int(self.img_y - self.stickerSpot_y)
         self.x2 = int(self.x1 + self.cols)
@@ -234,8 +240,10 @@ if __name__ == '__main__':
     camera = cv2.VideoCapture(0)  #打开摄像头
     root = tk.Tk()
     root.title('FaceTube')
+    NoteLabel = tk.Label(root)
+    NoteLabel.grid(row=0, column=0)
     ImgOutput = tk.Label(root)  #创建图形输出标签
-    ImgOutput.grid(row=0, column=0, rowspan=10, columnspan=10)
+    ImgOutput.grid(row=1, column=0, rowspan=10, columnspan=10)
     root.config(cursor="arrow")
     saveButton = tk.Button(root, text='保存文件', command=save_file)
     saveButton.grid(row=11, column=0)
@@ -245,45 +253,46 @@ if __name__ == '__main__':
     Hat = Sticker(name='Hat',
                   path='Hat.png',
                   faceSpot=[0.5, 0],
-                  stickerSpot=[0.5,1])
+                  stickerSpot=[0.5, 1])
     ChristmasHat = Sticker(name='ChristmasHat',
                            path='ChristmasHat.png',
                            faceSpot=[0.5, 0],
-                           stickerSpot=[0.5,1])
-    BearHat=Sticker(name='BearHat',
-                    path='BearHat.png',
-                    faceSpot=[0.5, 0],
-                    stickerSpot=[0.5,1])
+                           stickerSpot=[0.5, 1])
+    BearHat = Sticker(name='BearHat',
+                      path='BearHat.png',
+                      faceSpot=[0.5, 0],
+                      stickerSpot=[0.5, 1])
     HatFamily = StickerFamily('Hat', [ChristmasHat, Hat, BearHat])
     HatFamily.createfamilyButton(0, 10)
-    BrownBeard=Sticker(name='BrownBeard',
-                       path='BrownBeard.png',
-                       faceSpot=[0.5, 0.8],
-                       stickerSpot=[0.5,0.5])
-    Beard=Sticker(name='Beard',
-                  path='Beard.png',
-                  faceSpot=[0.5, 0.8],
-                  stickerSpot=[0.5,0.5])
-    GreyBeard=Sticker(name='GreyBeard',
-                      path='GreyBeard.png',
-                      faceSpot=[0.5, 0.8],
-                      stickerSpot=[0.5,0.5])
+    BrownBeard = Sticker(name='BrownBeard',
+                         path='BrownBeard.png',
+                         faceSpot=[0.5, 0.8],
+                         stickerSpot=[0.5, 0.5])
+    Beard = Sticker(name='Beard',
+                    path='Beard.png',
+                    faceSpot=[0.5, 0.8],
+                    stickerSpot=[0.5, 0.5])
+    GreyBeard = Sticker(name='GreyBeard',
+                        path='GreyBeard.png',
+                        faceSpot=[0.5, 0.8],
+                        stickerSpot=[0.5, 0.5])
     BeardFamily = StickerFamily('Beard', [Beard, BrownBeard, GreyBeard])
-    BeardFamily.createfamilyButton(1,10)
-    Glasses=Sticker(name='Glasses',
-                    path='Glasses.png',
-                    faceSpot=[0.5, 0.4],
-                    stickerSpot=[0.5,0.5])
-    SunGlasses=Sticker(name='SunGlasses',
-                       path='SunGlasses.png',
-                       faceSpot=[0.5, 0.4],
-                       stickerSpot=[0.5,0.5])
-    CoolGlasses=Sticker(name='CoolGlasses',
-                        path='CoolGlasses.png',
-                        faceSpot=[0.5, 0.4],
-                        stickerSpot=[0.5,0.5])
-    GlassesFamily = StickerFamily('Glasses', [Glasses, SunGlasses, CoolGlasses])
-    GlassesFamily.createfamilyButton(2,10)
+    BeardFamily.createfamilyButton(1, 10)
+    Glasses = Sticker(name='Glasses',
+                      path='Glasses.png',
+                      faceSpot=[0.5, 0.4],
+                      stickerSpot=[0.5, 0.5])
+    SunGlasses = Sticker(name='SunGlasses',
+                         path='SunGlasses.png',
+                         faceSpot=[0.5, 0.4],
+                         stickerSpot=[0.5, 0.5])
+    CoolGlasses = Sticker(name='CoolGlasses',
+                          path='CoolGlasses.png',
+                          faceSpot=[0.5, 0.4],
+                          stickerSpot=[0.5, 0.5])
+    GlassesFamily = StickerFamily('Glasses',
+                                  [Glasses, SunGlasses, CoolGlasses])
+    GlassesFamily.createfamilyButton(2, 10)
     face_param = [0, 0, 0]
     videoLoop()
     root.mainloop()
